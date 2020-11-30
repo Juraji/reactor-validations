@@ -33,9 +33,9 @@ jobs:
 
       - name: Expose build version
         id: expose_version
-        run:
-          - echo ./gradlew -q version >> $package_version
-          - echo "::set-output name=package_version::$package_version"
+        run: |
+          echo ./gradlew -q version >> $package_version
+          echo "::set-output name=package_version::$package_version"
 
   create-release:
     name: Release new version
