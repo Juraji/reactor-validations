@@ -39,7 +39,7 @@ jobs:
         id: check-version
         with:
           version-command: ./gradlew -q version
-          tag: false
+          create-tag: false
 
   create-release:
     name: Release new version
