@@ -46,9 +46,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: 'Check: Tag v${{ needs.build.outputs.package_version }} exists'
+        id: tagged
+        run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ needs.build.outputs.package_version }}" && echo "::set-output name=tagged::0" || echo "::set-output name=tagged::1"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        if: steps.tagged.outputs.tagged == 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -68,7 +76,7 @@ jobs:
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         continue-on-error: true
-        if: ${{ steps.create_release.outputs.upload_url }}
+        if: steps.tagged.outputs.tagged == 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
