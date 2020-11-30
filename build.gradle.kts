@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "nl.juraji"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 java.sourceCompatibility = JavaVersion.VERSION_14
 java.targetCompatibility = JavaVersion.VERSION_14
 
