@@ -7,7 +7,7 @@ jobs:
     name: Test & Build
     runs-on: ubuntu-latest
     outputs:
-      package_version: ${{ steps.expose_version.package_version }}
+      package_version: ${{ steps.expose_version.outputs.package_version }}
     steps:
       - uses: actions/checkout@v2
 
@@ -35,6 +35,7 @@ jobs:
         id: expose_version
         run: |
           package_version=$(./gradlew -q version)
+          echo $package_version
           echo "::set-output name=package_version::$package_version"
 
   create-release:
@@ -50,8 +51,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.build.output.package_version }}
-          release_name: Release ${{ needs.build.output.package_version }}
+          tag_name: v${{ needs.build.outputs.package_version }}
+          release_name: Release v${{ needs.build.outputs.package_version }}
           body: |
             Changes in this Release
             - ...
@@ -69,6 +70,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./reactor-validations-${{ needs.build.output.package_version }}.jar
-          asset_name: reactor-validations-${{ needs.build.output.package_version }}.jar
+          asset_path: ./reactor-validations-${{ needs.build.outputs.package_version }}.jar
+          asset_name: reactor-validations-${{ needs.build.outputs.package_version }}.jar
           asset_content_type: application/java-archive
