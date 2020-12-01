@@ -1,7 +1,8 @@
 package nl.juraji.reactor.validations
 
-internal class ValidatorImpl : Validator {
+internal class ValidatorImpl(
     private var exceptionCreator: (String) -> Throwable = { message -> ValidationException(message) }
+) : Validator {
 
     override fun useException(creator: (String) -> Throwable): Validator {
         exceptionCreator = creator

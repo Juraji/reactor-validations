@@ -3,9 +3,10 @@ package nl.juraji.reactor.validations
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-internal class AsyncValidatorImpl : AsyncValidator {
-    private val creators: MutableList<() -> Mono<Boolean>> = mutableListOf()
+internal class AsyncValidatorImpl(
     private var exceptionCreator: (String) -> Throwable = { message -> ValidationException(message) }
+) : AsyncValidator {
+    private val creators: MutableList<() -> Mono<Boolean>> = mutableListOf()
 
     override fun useException(creator: (String) -> Throwable): AsyncValidator {
         exceptionCreator = creator
@@ -37,7 +38,9 @@ internal class AsyncValidatorImpl : AsyncValidator {
     override fun unless(predicate: Boolean, validation: AsyncValidator.() -> Unit): AsyncValidator {
         collect {
             if (predicate) success()
-            else AsyncValidatorImpl().apply(validation).run()
+            else AsyncValidatorImpl(exceptionCreator)
+                .apply(validation)
+                .run()
         }
 
         return this
@@ -47,7 +50,9 @@ internal class AsyncValidatorImpl : AsyncValidator {
         collect {
             predicate.flatMap {
                 if (it) success()
-                else AsyncValidatorImpl().apply(validation).run()
+                else AsyncValidatorImpl(exceptionCreator)
+                    .apply(validation)
+                    .run()
             }
         }
 
@@ -57,21 +62,17 @@ internal class AsyncValidatorImpl : AsyncValidator {
     override fun synchronous(validation: Validator.() -> Unit): AsyncValidator {
         collect {
             Mono.just(validation)
-                    .map {
-                        ValidatorImpl()
-                                .useException(exceptionCreator)
-                                .apply(it)
-                    }
-                    .flatMap { success() }
+                .map { ValidatorImpl(exceptionCreator).apply(it) }
+                .flatMap { success() }
         }
 
         return this
     }
 
     fun run(): Mono<Boolean> = Flux
-            .fromIterable(creators)
-            .flatMap { it.invoke() }
-            .all { it }
+        .fromIterable(creators)
+        .flatMap { it.invoke() }
+        .all { it }
 
     private fun collect(creator: () -> Mono<Boolean>) {
         creators.add(creator)
