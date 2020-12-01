@@ -26,17 +26,6 @@ dependencies {
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "GithubPackages"
-            url = uri("https://maven.pkg.github.com/Juraji/reactor-validations")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-
     publications {
         create<MavenPublication>("mavenJava") {
             pom {
