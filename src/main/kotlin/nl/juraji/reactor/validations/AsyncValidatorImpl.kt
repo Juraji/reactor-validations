@@ -5,6 +5,11 @@ import reactor.core.publisher.Mono
 
 internal class AsyncValidatorImpl : AsyncValidator {
     private val creators: MutableList<() -> Mono<Boolean>> = mutableListOf()
+    private var exceptionCreator: (String) -> Throwable = { message -> ValidationException(message) }
+
+    override fun useException(creator: (String) -> Throwable) {
+        exceptionCreator = creator
+    }
 
     override fun isTrue(assertion: Mono<Boolean>, message: () -> String) = collect {
         assertion.flatMap { b ->
@@ -48,5 +53,5 @@ internal class AsyncValidatorImpl : AsyncValidator {
     }
 
     private fun success(): Mono<Boolean> = Mono.just(true)
-    private fun fail(message: () -> String): Mono<Boolean> = Mono.error { ValidationException(message()) }
+    private fun fail(message: () -> String): Mono<Boolean> = Mono.error { exceptionCreator(message()) }
 }

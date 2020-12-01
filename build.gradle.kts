@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "nl.juraji"
-version = "1.0.2"
+version = "1.0.3"
 java.sourceCompatibility = JavaVersion.VERSION_14
 java.targetCompatibility = JavaVersion.VERSION_14
 

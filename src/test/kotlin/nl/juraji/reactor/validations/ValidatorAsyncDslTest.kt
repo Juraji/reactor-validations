@@ -1,5 +1,6 @@
 package nl.juraji.reactor.validations
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
@@ -131,6 +132,19 @@ class ValidatorAsyncDslTest {
 
         StepVerifier.create(validated)
                 .expectError(ValidationException::class.java)
+                .verify()
+    }
+
+    @Test
+    internal fun `should use custom exception creator`() {
+        val validated = validateAsync {
+            useException { NoSuchElementException(it) }
+
+            isFalse(Mono.just(true)) { "Should not throw" }
+        }
+
+        StepVerifier.create(validated)
+                .expectError(NoSuchElementException::class.java)
                 .verify()
     }
 }

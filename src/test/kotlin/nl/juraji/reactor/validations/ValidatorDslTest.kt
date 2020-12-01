@@ -76,4 +76,15 @@ class ValidatorDslTest {
             }
         }
     }
+
+    @Test
+    internal fun `should use custom exception creator`() {
+        Assertions.assertThrows(NoSuchElementException::class.java) {
+            validate {
+                useException { NoSuchElementException(it) }
+
+                isNotBlank("   ") { "Should throw" }
+            }
+        }
+    }
 }

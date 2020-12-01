@@ -1,6 +1,12 @@
 package nl.juraji.reactor.validations
 
 internal class ValidatorImpl : Validator {
+    private var exceptionCreator: (String) -> Throwable = { message -> ValidationException(message) }
+
+    override fun useException(creator: (String) -> Throwable) {
+        exceptionCreator = creator
+    }
+
     override fun isTrue(assertion: Boolean, message: () -> String) {
         if (!assertion) fail(message)
     }
@@ -25,5 +31,5 @@ internal class ValidatorImpl : Validator {
         if (collection.isEmpty()) fail(message)
     }
 
-    override fun fail(message: () -> String): Nothing = throw ValidationException(message())
+    override fun fail(message: () -> String): Nothing = throw exceptionCreator.invoke(message())
 }

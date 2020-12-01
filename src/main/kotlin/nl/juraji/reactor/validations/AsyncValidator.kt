@@ -5,6 +5,13 @@ import reactor.core.publisher.Mono
 interface AsyncValidator {
 
     /**
+     * Override the default [ValidationException] with a custom exception creator
+     *
+     * @param creator A [Function] which returns the exception to continue with based on the input message
+     */
+    fun useException(creator: (String) -> Throwable)
+
+    /**
      * Assert that [assertion] results in `true`.
      *
      * @param assertion A [Mono] resulting in a [Boolean].

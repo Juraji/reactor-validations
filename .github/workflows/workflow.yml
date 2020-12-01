@@ -57,7 +57,7 @@ jobs:
   release:
     name: Release version
     runs-on: ubuntu-latest
-    needs: check_should_release
+    needs: [build, check_should_release]
     if: needs.check_should_release.outputs.should_release == 1
     steps:
       - uses: actions/checkout@v2

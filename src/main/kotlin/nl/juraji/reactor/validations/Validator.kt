@@ -3,6 +3,13 @@ package nl.juraji.reactor.validations
 interface Validator {
 
     /**
+     * Override the default [ValidationException] with a custom exception creator
+     *
+     * @param creator A [Function] which returns the exception to throw based on the input message
+     */
+    fun useException(creator: (String) -> Throwable)
+
+    /**
      * Validate that [assertion] equals to `true`.
      *
      * @param assertion The [Boolean] value to validate.
