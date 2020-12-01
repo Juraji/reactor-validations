@@ -7,40 +7,65 @@ internal class AsyncValidatorImpl : AsyncValidator {
     private val creators: MutableList<() -> Mono<Boolean>> = mutableListOf()
     private var exceptionCreator: (String) -> Throwable = { message -> ValidationException(message) }
 
-    override fun useException(creator: (String) -> Throwable) {
+    override fun useException(creator: (String) -> Throwable): AsyncValidator {
         exceptionCreator = creator
+        return this
     }
 
-    override fun isTrue(assertion: Mono<Boolean>, message: () -> String) = collect {
-        assertion.flatMap { b ->
-            if (b) success()
-            else fail(message)
+    override fun isTrue(assertion: Mono<Boolean>, message: () -> String): AsyncValidator {
+        collect {
+            assertion.flatMap { b ->
+                if (b) success()
+                else fail(message)
+            }
         }
+
+        return this
     }
 
-    override fun isFalse(assertion: Mono<Boolean>, message: () -> String) = collect {
-        assertion.flatMap { b ->
-            if (!b) success()
-            else fail(message)
+    override fun isFalse(assertion: Mono<Boolean>, message: () -> String): AsyncValidator {
+        collect {
+            assertion.flatMap { b ->
+                if (!b) success()
+                else fail(message)
+            }
         }
+
+        return this
     }
 
-    override fun unless(predicate: Boolean, validation: AsyncValidator.() -> Unit) = collect {
-        if (predicate) success()
-        else AsyncValidatorImpl().apply(validation).run()
-    }
-
-    override fun unless(predicate: Mono<Boolean>, validation: AsyncValidator.() -> Unit) = collect {
-        predicate.flatMap {
-            if (it) success()
+    override fun unless(predicate: Boolean, validation: AsyncValidator.() -> Unit): AsyncValidator {
+        collect {
+            if (predicate) success()
             else AsyncValidatorImpl().apply(validation).run()
         }
+
+        return this
     }
 
-    override fun synchronous(validation: Validator.() -> Unit) = collect {
-        Mono.just(validation)
-                .map(::validate)
-                .flatMap { success() }
+    override fun unless(predicate: Mono<Boolean>, validation: AsyncValidator.() -> Unit): AsyncValidator {
+        collect {
+            predicate.flatMap {
+                if (it) success()
+                else AsyncValidatorImpl().apply(validation).run()
+            }
+        }
+
+        return this
+    }
+
+    override fun synchronous(validation: Validator.() -> Unit): AsyncValidator {
+        collect {
+            Mono.just(validation)
+                    .map {
+                        ValidatorImpl()
+                                .useException(exceptionCreator)
+                                .apply(it)
+                    }
+                    .flatMap { success() }
+        }
+
+        return this
     }
 
     fun run(): Mono<Boolean> = Flux

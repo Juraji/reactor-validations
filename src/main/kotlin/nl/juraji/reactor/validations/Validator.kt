@@ -7,7 +7,7 @@ interface Validator {
      *
      * @param creator A [Function] which returns the exception to throw based on the input message
      */
-    fun useException(creator: (String) -> Throwable)
+    fun useException(creator: (String) -> Throwable): Validator
 
     /**
      * Validate that [assertion] equals to `true`.
@@ -15,7 +15,7 @@ interface Validator {
      * @param assertion The [Boolean] value to validate.
      * @throws ValidationException When [assertion] equals to `false`.
      */
-    fun isTrue(assertion: Boolean, message: () -> String)
+    fun isTrue(assertion: Boolean, message: () -> String): Validator
 
     /**
      * Validate that [assertion] equals to `false`.
@@ -24,7 +24,7 @@ interface Validator {
      * @param message A [Function] which results in a descriptive message.
      * @throws ValidationException When [assertion] equals to `true`.
      */
-    fun isFalse(assertion: Boolean, message: () -> String)
+    fun isFalse(assertion: Boolean, message: () -> String): Validator
 
     /**
      * Validate that [value] is not `null` or [Unit].
@@ -33,7 +33,7 @@ interface Validator {
      * @param message A [Function] which results in a descriptive message.
      * @throws ValidationException When [value] equals to `null` or [Unit].
      */
-    fun isNotNull(value: Any?, message: () -> String)
+    fun isNotNull(value: Any?, message: () -> String): Validator
 
     /**
      * Validate that [value] is not `null` or blank.
@@ -42,7 +42,7 @@ interface Validator {
      * @param message A [Function] which results in a descriptive message.
      * @throws ValidationException When [value] equals to `null` or is blank.
      */
-    fun isNotBlank(value: String?, message: () -> String)
+    fun isNotBlank(value: String?, message: () -> String): Validator
 
     /**
      * Validate that [collection] is not empty.
@@ -51,7 +51,7 @@ interface Validator {
      * @param message A [Function] which results in a descriptive message.
      * @throws ValidationException When [collection] is empty.
      */
-    fun isNotEmpty(collection: Collection<Any>, message: () -> String)
+    fun isNotEmpty(collection: Collection<Any>, message: () -> String): Validator
 
     /**
      * Ignore [validation] block when [predicate] equals to `true`.
@@ -59,7 +59,7 @@ interface Validator {
      * @param predicate A [Boolean] value whether to run [validation] block or not.
      * @param validation A new [Validator] block.
      */
-    fun unless(predicate: Boolean, validation: Validator.() -> Unit)
+    fun unless(predicate: Boolean, validation: Validator.() -> Unit): Validator
 
     /**
      * Fail with [message].

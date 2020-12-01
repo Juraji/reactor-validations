@@ -136,6 +136,22 @@ class ValidatorAsyncDslTest {
     }
 
     @Test
+    fun `synchronous should inherit useException creator`() {
+        val validated = validateAsync {
+            useException { NoSuchElementException(it) }
+
+            synchronous {
+                isFalse(false) { "Should not throw" }
+                isTrue(false) { "Should throw" }
+            }
+        }
+
+        StepVerifier.create(validated)
+                .expectError(NoSuchElementException::class.java)
+                .verify()
+    }
+
+    @Test
     internal fun `should use custom exception creator`() {
         val validated = validateAsync {
             useException { NoSuchElementException(it) }

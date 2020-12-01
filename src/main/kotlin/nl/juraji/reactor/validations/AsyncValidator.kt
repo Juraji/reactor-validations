@@ -9,7 +9,7 @@ interface AsyncValidator {
      *
      * @param creator A [Function] which returns the exception to continue with based on the input message
      */
-    fun useException(creator: (String) -> Throwable)
+    fun useException(creator: (String) -> Throwable): AsyncValidator
 
     /**
      * Assert that [assertion] results in `true`.
@@ -17,7 +17,7 @@ interface AsyncValidator {
      * @param assertion A [Mono] resulting in a [Boolean].
      * @param message A [Function] which results in the validation exception message.
      */
-    fun isTrue(assertion: Mono<Boolean>, message: () -> String)
+    fun isTrue(assertion: Mono<Boolean>, message: () -> String): AsyncValidator
 
     /**
      * Assert that [assertion] results in `false`.
@@ -25,7 +25,7 @@ interface AsyncValidator {
      * @param assertion A [Mono] resulting in a [Boolean].
      * @param message A [Function] which results in the validation exception message.
      */
-    fun isFalse(assertion: Mono<Boolean>, message: () -> String)
+    fun isFalse(assertion: Mono<Boolean>, message: () -> String): AsyncValidator
 
     /**
      * Run [validation] block only when [predicate] is `false`.
@@ -33,7 +33,7 @@ interface AsyncValidator {
      * @param predicate A [Boolean] value whether to run [validation] or not.
      * @param validation A new [AsyncValidator] block.
      */
-    fun unless(predicate: Boolean, validation: AsyncValidator.() -> Unit)
+    fun unless(predicate: Boolean, validation: AsyncValidator.() -> Unit): AsyncValidator
 
     /**
      * Run [validation] block only when [predicate] results in `false`.
@@ -41,12 +41,12 @@ interface AsyncValidator {
      * @param predicate A [Mono] of type [Boolean] whether to run [validation] or not.
      * @param validation A new [AsyncValidator] block.
      */
-    fun unless(predicate: Mono<Boolean>, validation: AsyncValidator.() -> Unit)
+    fun unless(predicate: Mono<Boolean>, validation: AsyncValidator.() -> Unit): AsyncValidator
 
     /**
      * Run a synchronous [Validator] block as part of this validation.
      *
      * @param validation A new [Validator] block
      */
-    fun synchronous(validation: Validator.() -> Unit)
+    fun synchronous(validation: Validator.() -> Unit): AsyncValidator
 }
