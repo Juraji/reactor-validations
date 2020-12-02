@@ -69,7 +69,27 @@ myReactiveService.stuffToValidate()
 
 ## Api
 
-### Synchronous Validator DSL
+### DSL Entry Points
+```kotlin
+/**
+ * Initialize a new asynchronous validation block.
+ *
+ * @param block An [AsyncValidator] block.
+ * @return A [Mono] resulting in `true` when validation succeeds
+ * or a [Mono] of [ValidationException] when validation fails.
+ */
+fun validateAsync(block: AsyncValidator.() -> Unit): Mono<Boolean>
+
+/**
+ * Initialize a new validation block.
+ *
+ * @param block A [Validator] block.
+ * @throws ValidationException When a validation fails.
+ */
+fun validate(block: Validator.() -> Unit): Validator
+```
+
+### Synchronous Validator DSL interface
 ```kotlin
 import nl.juraji.reactor.validations.validate
 
@@ -144,7 +164,7 @@ validate {
 
 ```
 
-### Asynchronous Validator DSL
+### Asynchronous Validator DSL interface
 ```kotlin
 import nl.juraji.reactor.validations.validate
 
@@ -195,4 +215,39 @@ validateAsync {
      */
     fun synchronous(validation: Validator.() -> Unit): AsyncValidator
 }
+```
+
+### Reactor extension functions
+```kotlin
+/**
+ * Run synchronous validation on the entry value
+ *
+ * @param block A [Validator] block.
+ * @return The entry [Mono] or a [Mono] of [ValidationException] when validation fails.
+ */
+fun <T : Any> Mono<T>.validate(block: Validator.(T) -> Unit): Mono<T>
+
+/**
+ * Run asynchronous validation on the entry value
+ *
+ * @param block An [AsyncValidator] block.
+ * @return The entry [Mono] or a [Mono] of [ValidationException] when validation fails.
+ */
+fun <T : Any> Mono<T>.validateAsync(block: AsyncValidator.(T) -> Unit): Mono<T>
+
+/**
+ * Run synchronous validation on the stream
+ *
+ * @param block A [Validator] block.
+ * @return The entry [Flux] or a [Flux] of [ValidationException] when validation fails.
+ */
+fun <T : Any> Flux<T>.validate(block: Validator.(T) -> Unit): Flux<T>
+
+/**
+ * Run asynchronous validation on the stream
+ *
+ * @param block An [AsyncValidator] block.
+ * @return The entry [Flux] or a [Flux] of [ValidationException] when validation fails.
+ */
+fun <T : Any> Flux<T>.validateAsync(block: AsyncValidator.(T) -> Unit): Flux<T>
 ```
