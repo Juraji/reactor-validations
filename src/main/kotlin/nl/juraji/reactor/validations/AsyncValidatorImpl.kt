@@ -35,6 +35,21 @@ internal class AsyncValidatorImpl(
         return this
     }
 
+    override fun <T : Any> succeeds(mono: Mono<T>, message: (() -> String)?): AsyncValidator {
+        collect {
+            mono
+                .flatMap { success() }
+                .onErrorMap {
+                    val msg = message?.invoke() ?: it.message
+                    ?: "Mono given to #succeeds() failed but exception message was null"
+
+                    exceptionCreator(msg)
+                }
+        }
+
+        return this
+    }
+
     override fun unless(predicate: Boolean, validation: AsyncValidator.() -> Unit): AsyncValidator {
         collect {
             if (predicate) success()

@@ -1,6 +1,5 @@
 package nl.juraji.reactor.validations
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
@@ -13,9 +12,9 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectNext(true)
-                .expectComplete()
-                .verify()
+            .expectNext(true)
+            .expectComplete()
+            .verify()
     }
 
     @Test
@@ -25,8 +24,8 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(ValidationException::class.java)
-                .verify()
+            .expectError(ValidationException::class.java)
+            .verify()
     }
 
     @Test
@@ -36,9 +35,9 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectNext(true)
-                .expectComplete()
-                .verify()
+            .expectNext(true)
+            .expectComplete()
+            .verify()
     }
 
     @Test
@@ -48,8 +47,42 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(ValidationException::class.java)
-                .verify()
+            .expectError(ValidationException::class.java)
+            .verify()
+    }
+
+    @Test
+    internal fun `succeeds should proceed when given mono completes normally`() {
+        val validated = validateAsync {
+            succeeds(Mono.just("Something")) { "Should complete" }
+        }
+
+        StepVerifier.create(validated)
+            .expectNext(true)
+            .expectComplete()
+            .verify()
+    }
+
+    @Test
+    internal fun `succeeds should fail with given message creator when given mono completes with error`() {
+        val validated = validateAsync {
+            succeeds(Mono.error { IllegalArgumentException("Some error") }) { "Should not complete" }
+        }
+
+        StepVerifier.create(validated)
+            .expectErrorMatches { it is ValidationException && it.message == "Should not complete" }
+            .verify()
+    }
+
+    @Test
+    internal fun `succeeds should fail and inherit message when given mono completes with error with message creator omitted`() {
+        val validated = validateAsync {
+            succeeds(Mono.error { IllegalArgumentException("Some error") })
+        }
+
+        StepVerifier.create(validated)
+            .expectErrorMatches { it is ValidationException && it.message == "Some error" }
+            .verify()
     }
 
     @Test
@@ -61,9 +94,9 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectNext(true)
-                .expectComplete()
-                .verify()
+            .expectNext(true)
+            .expectComplete()
+            .verify()
     }
 
     @Test
@@ -75,8 +108,8 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(ValidationException::class.java)
-                .verify()
+            .expectError(ValidationException::class.java)
+            .verify()
     }
 
     @Test
@@ -88,9 +121,9 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectNext(true)
-                .expectComplete()
-                .verify()
+            .expectNext(true)
+            .expectComplete()
+            .verify()
     }
 
     @Test
@@ -102,8 +135,8 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(ValidationException::class.java)
-                .verify()
+            .expectError(ValidationException::class.java)
+            .verify()
     }
 
     @Test
@@ -116,9 +149,9 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectNext(true)
-                .expectComplete()
-                .verify()
+            .expectNext(true)
+            .expectComplete()
+            .verify()
     }
 
     @Test
@@ -131,8 +164,8 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(ValidationException::class.java)
-                .verify()
+            .expectError(ValidationException::class.java)
+            .verify()
     }
 
     @Test
@@ -147,8 +180,8 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(NoSuchElementException::class.java)
-                .verify()
+            .expectError(NoSuchElementException::class.java)
+            .verify()
     }
 
     @Test
@@ -160,7 +193,7 @@ class ValidatorAsyncDslTest {
         }
 
         StepVerifier.create(validated)
-                .expectError(NoSuchElementException::class.java)
-                .verify()
+            .expectError(NoSuchElementException::class.java)
+            .verify()
     }
 }

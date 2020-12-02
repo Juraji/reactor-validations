@@ -28,6 +28,15 @@ interface AsyncValidator {
     fun isFalse(assertion: Mono<Boolean>, message: () -> String): AsyncValidator
 
     /**
+     * Assert given mono completes
+     *
+     * @param mono The [Mono] to run
+     * @param message Optional: A [Function] which results in the validation exception message.
+     * When omitted the resulting [ValidationException] will inherit the emitted error message
+     */
+    fun <T : Any> succeeds(mono: Mono<T>, message: (() -> String)? = null): AsyncValidator
+
+    /**
      * Run [validation] block only when [predicate] is `false`.
      *
      * @param predicate A [Boolean] value whether to run [validation] or not.
